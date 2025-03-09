@@ -4,7 +4,9 @@ namespace App\Http\Controllers;
 
 use App\Models\Purchasing;
 use App\Http\Controllers\Controller;
+use App\Models\InventoryMovement;
 use App\Models\Product;
+use App\Models\Stock;
 use Illuminate\Http\Request;
 
 class PurchasingController extends Controller
@@ -49,9 +51,46 @@ class PurchasingController extends Controller
             $request['pricePerUnit'] = $request->smallPrice / $request->smallQty;
             $request['purchaseStatus'] = 'LUNAS';
 
-            // menjalankan fungsi insert pada table customer 
+            // menjalankan fungsi insert pada table purchasing 
             Purchasing::create($request->all());
-            // redirect ke halaman list customer
+            // redirect ke halaman list purchasing
+
+            //check data pada table stock jika data sudah ada maka update jika belum maka insert by productId==productId and smallUom==uom
+            $stock = Stock::where('id', $request->productId)
+                ->where('uom', $request->smallUom)->first();
+
+            if ($stock) {
+                $stock->totalStock += $request->smallQty;
+                $stock->remainingStock += $request->smallQty;
+                $stock->pricePerUnit = ($stock->pricePerUnit + $request->pricePerUnit) / 2;
+                $stock->save();
+            } else {
+                Stock::create([
+                    'productId' => $request->productId,
+                    'productName' => $request->productName,
+                    'totalStock' => $request->smallQty,
+                    'uom' => $request->smallUom,
+                    'remainingStock' => $request->smallQty,
+                    'pricePerUnit' => $request->pricePerUnit,
+                ]);
+            }
+
+            //create inventory movement
+            $inventoryMovement = [
+                'productId' => $request->productId,
+                'productName' => $request->productName,
+                'uom' => $request->smallUom,
+                'qty' => $request->smallQty,
+                'movementType' => 'IN',
+                'date' => $request->date,
+                'pricePerUnit' => $request->pricePerUnit,
+                'totalPrice' => $request->smallPrice,
+                'purchase_id' => Purchasing::latest()->first()->id,
+            ];
+
+            InventoryMovement::create($inventoryMovement);
+
+
             return redirect()->route('purchasing.index')->with('success', 'Berhasil menambahkan data');
         } catch (\Throwable $th) {
             //throw $th;
