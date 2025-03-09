@@ -63,8 +63,8 @@ return [
     |
     */
 
-    'logo' => '<b>Admin</b>LTE',
-    'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
+    'logo' => '<b>Inventory</b>LTE',
+    // 'logo_img' => 'vendor/adminlte/dist/img/AdminLTELogo.png',
     'logo_img_class' => 'brand-image img-circle elevation-3',
     'logo_img_xl' => null,
     'logo_img_xl_class' => 'brand-image-xs',
@@ -326,6 +326,14 @@ return [
             'icon' => 'fas fa-bars',
         ],
 
+         //Menu
+         ['header' => 'TRANSAKSI'],
+         [
+             'text' => 'PEMBELIAN',
+             'url'  => 'purchasing',
+             'icon' => 'far fa-fw fa-file',
+         ],
+
         // [
         //     'type' => 'sidebar-menu-search',
         //     'text' => 'search',
@@ -465,7 +473,7 @@ return [
             ],
         ],
         'Select2' => [
-            'active' => false,
+            'active' => true,
             'files' => [
                 [
                     'type' => 'js',
