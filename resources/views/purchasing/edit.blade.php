@@ -76,7 +76,8 @@
                             <div class="col-sm-2"></div>
                             <div class="col-sm-10">
                                 <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="hasConversion" value="{{$data->hasConversion}}">
+                                    <input class="form-check-input" type="checkbox" id="hasConversion" name="hasConversion"
+                                        value="1" {{ $data->hasConversion ? 'checked' : '' }}>
                                     <label class="form-check-label" for="hasConversion">
                                         Ada Konversi
                                     </label>
@@ -124,6 +125,7 @@
 <!-- AUTO UPDATE CONVERSION FIELDS -->
 <script>
     // ENABLING CONVERSION FIELDS
+    // ENABLING CONVERSION FIELDS
     document.addEventListener("DOMContentLoaded", function() {
         const hasConversion = document.getElementById("hasConversion");
         const purchaseQty = document.getElementById("purchaseQty");
@@ -132,35 +134,40 @@
         const smallQty = document.getElementById("smallQty");
         const smallUom = document.getElementById("smallUom");
         const smallPrice = document.getElementById("smallPrice");
+        const conversionSection = document.getElementById("conversionSection");
+        const formattedSmallPrice = document.getElementById("formattedSmallPrice");
 
         function updateConversionFields() {
             if (hasConversion.checked) {
                 // Jika checkbox dicentang, input manual
-                //menampilkan inputan
-                document.getElementById("conversionSection").style.display = "block";
-                document.getElementById("formattedSmallPrice").required = true;
-
+                conversionSection.style.display = "block";
+                formattedSmallPrice.required = true;
             } else {
-                // Jika tidak dicentang, ambil nilai dari Jumlah Pembelian
-                smallQty.value = purchaseQty.value;
-                smallUom.value = purchaseUom.value;
-                smallPrice.value = purchasePrice.value;
-
-                //menyembunyikan inputan
-                document.getElementById("conversionSection").style.display = "none";
-                document.getElementById("formattedSmallPrice").required = false;
+                // Menyembunyikan inputan
+                conversionSection.style.display = "none";
+                formattedSmallPrice.required = false;
             }
         }
+
+        // Saat halaman dimuat, pastikan status checkbox disesuaikan
+        updateConversionFields();
 
         // Saat checkbox berubah
         hasConversion.addEventListener("change", updateConversionFields);
 
         // Saat jumlah pembelian berubah, jika checkbox tidak dicentang, update otomatis
-        purchaseQty.addEventListener("input", updateConversionFields);
-        purchaseUom.addEventListener("input", updateConversionFields);
-        purchasePrice.addEventListener("input", updateConversionFields);
-    });
+        purchaseQty.addEventListener("input", function() {
+            if (!hasConversion.checked) updateConversionFields();
+        });
 
+        purchaseUom.addEventListener("input", function() {
+            if (!hasConversion.checked) updateConversionFields();
+        });
+
+        purchasePrice.addEventListener("input", function() {
+            if (!hasConversion.checked) updateConversionFields();
+        });
+    });
 
     //KONVERSI HARGA KE NILAI INDONESIA
     document.addEventListener("DOMContentLoaded", function() {

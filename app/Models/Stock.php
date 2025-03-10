@@ -21,5 +21,7 @@ class Stock extends Model
         'totalStock',
         'remainingStock',
         'pricePerUnit',
+        'sellingPricePerUnit',
+        'totalPrice'
     ];
 }
