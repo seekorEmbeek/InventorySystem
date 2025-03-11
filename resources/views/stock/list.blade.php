@@ -39,6 +39,10 @@
                                         <a href="{{ route('stock.edit',$c->id)}}" class="btn btn-primary">
                                             <i class="fas fa-edit"></i>
                                             Edit</a>
+
+                                        <a href="{{ route('stock.conversion',$c->id)}}" class="btn btn-warning">
+                                            <i class="fas fa-exchange-alt"></i>
+                                            Conversi</a>
                                     </div>
                                 </td>
                             </tr>

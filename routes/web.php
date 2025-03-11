@@ -41,3 +41,5 @@ Route::resource('/purchasing', PurchasingController::class);
 
 //stock
 Route::resource('/stock', StockController::class);
+Route::get('/stock/conversion/{id}', [StockController::class, 'editConversion'])->name('stock.conversion');
+Route::put('/stock/conversion/{id}', [StockController::class, 'updateConversion'])->name('stock.conversion');

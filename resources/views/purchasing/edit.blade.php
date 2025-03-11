@@ -43,7 +43,7 @@
                             <label for="inputEmail3" class="col-sm-2 col-form-label">Barang</label>
                             <div class="col-sm-10">
                                 <x-adminlte-select2 name="productId" id="product" required>
-                                    <option disabled selected>Harap pilih barang ...</option>
+                                    <!-- <option disabled selected>Harap pilih barang ...</option> -->
 
                                     @foreach ($product as $c)
                                     <option value="{{ $c->id }}" {{ $c->id == $data->productId ? 'selected' : '' }}>
@@ -62,8 +62,9 @@
                                     required>
                             </div>
                             <div class="col-sm-3">
-                                <input type="text" class="form-control" id="purchaseUom" name="purchaseUom" value="{{$data->purchaseUom}}" placeholder="Satuan Beli"
-                                    required>
+                                <!-- <input type="text" class="form-control" id="purchaseUom" name="purchaseUom" value="{{$data->purchaseUom}}" placeholder="Satuan Beli"
+                                    required> -->
+                                <x-uom-dropdown : selected="{{$data->purchaseUom}}" name="purchaseUom" id="purchaseUom" />
                             </div>
                             <div class="col-sm-3">
                                 <input type="text" class="form-control" id="formattedPurchasePrice" value="{{ number_format($data->purchasePrice, 0, ',', '.') }}" placeholder="Harga Beli" required>
@@ -93,7 +94,8 @@
                                     <input type="number" class="form-control" id="smallQty" name="smallQty" value="{{$data->smallQty}}" placeholder="Jumlah Conversi">
                                 </div>
                                 <div class="col-sm-3">
-                                    <input type="text" class="form-control" id="smallUom" name="smallUom" value="{{$data->smallUom}}" placeholder="Satuan Conversi">
+                                    <!-- <input type="text" class="form-control" id="smallUom" name="smallUom" value="{{$data->smallUom}}" placeholder="Satuan Conversi"> -->
+                                    <x-uom-dropdown : selected="{{$data->smallUom}}" name="smallUom" id="smallUom" />
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" class="form-control" id="formattedSmallPrice" value="{{ number_format($data->smallPrice, 0, ',', '.') }}" placeholder="Harga Beli">
