@@ -76,8 +76,9 @@
                                 <input type="number" class="form-control" id="smallQty" name="smallQty" placeholder="Jumlah" required>
                             </div>
 
-                            <div class="col-sm-2">
-                                <input type="text" class="form-control" id="smallUom" name="smallUom" placeholder="Satuan" required>
+                            <div class="col-sm-3">
+                                <!-- <input type="text" class="form-control" id="smallUom" name="smallUom" placeholder="Satuan" required> -->
+                                <x-uom-dropdown :selected name="smallUom" id="smallUom" />
                             </div>
 
                             <div class="col-sm-2">

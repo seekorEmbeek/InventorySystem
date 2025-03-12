@@ -323,7 +323,7 @@ return [
         [
             'text' => 'BARANG',
             'url'  => 'product',
-            'icon' => 'fas fa-bars',
+            'icon' => 'fas fa-shopping-bag',
         ],
 
         //Menu
@@ -331,14 +331,21 @@ return [
         [
             'text' => 'PEMBELIAN',
             'url'  => 'purchasing',
-            'icon' => 'fa fa-cart-plus',
+            'icon' => 'fas fa-cart-plus',
         ],
 
         ['header' => 'STOCK'],
         [
             'text' => 'STOCK',
             'url'  => 'stock',
-            'icon' => 'far fa-fw fa-file',
+            'icon' => 'fas fa-fw fa-file',
+        ],
+
+        ['header' => 'PENJUALAN'],
+        [
+            'text' => 'PENJUALAN',
+            'url'  => 'sales',
+            'icon' => 'fas fa-truck',
         ],
 
         // [

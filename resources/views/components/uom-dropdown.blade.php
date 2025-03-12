@@ -1,6 +1,6 @@
 <div class="form-group">
     <select class="form-control select2" name="{{ $name }}" id="{{ $id }}" required>
-        <option value="" disabled selected></option> <!-- Placeholder -->
+        <option value="" disabled selected>--Pilih Satuan--</option> <!-- Placeholder -->
         @foreach($uoms as $uom)
         <option value="{{ $uom }}" {{ $selected == $uom ? 'selected' : '' }}>
             {{ strtoupper($uom) }}

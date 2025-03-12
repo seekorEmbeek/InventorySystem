@@ -3,6 +3,7 @@
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\PurchasingController;
+use App\Http\Controllers\SalesController;
 use App\Http\Controllers\StockController;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
@@ -43,3 +44,6 @@ Route::resource('/purchasing', PurchasingController::class);
 Route::resource('/stock', StockController::class);
 Route::get('/stock/conversion/{id}', [StockController::class, 'editConversion'])->name('stock.conversion');
 Route::put('/stock/conversion/{id}', [StockController::class, 'updateConversion'])->name('stock.conversion');
+
+//sales
+Route::resource('/sales', SalesController::class);

@@ -6,25 +6,26 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-class InventoryMovement extends Model
+class Sales extends Model
 {
     //
     use HasFactory;
     use SoftDeletes;
-
-    protected $table = 'inventory_movements';
+    protected $table = 'sales';
 
     protected $fillable = [
-        'id',
-        'productId',
-        'productName',
-        'uom',
-        'qty',
-        'movementType',
+        'buyerName',
         'date',
-        'pricePerUnit',
+        'qty',
         'totalPrice',
-        'purchase_id',
-        'salesItem_id',
+        'totalPayment',
+        'remainingPayment',
+        'status',
+        'stock_id'
     ];
+
+    public function items()
+    {
+        return $this->hasMany(SalesItem::class, 'sales_id');
+    }
 }

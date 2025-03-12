@@ -42,7 +42,7 @@
                             <label for="inputEmail3" class="col-sm-2 col-form-label">Barang</label>
                             <div class="col-sm-10">
                                 <x-adminlte-select2 name="productId" id="product" required>
-                                    <!-- <option value="" disabled selected>Harap pilih barang ...</option> -->
+                                    <option value="" disabled selected>Harap pilih barang ...</option>
                                     @foreach ($product as $c)
 
                                     <option value="{{ $c->id}}">{{ $c-> name }}</option>
@@ -61,7 +61,7 @@
                             <div class="col-sm-3">
                                 <!-- <input type="text" class="form-control"  id="purchaseUom" name="purchaseUom" placeholder="Satuan Beli"
                                     required> -->
-                                <x-uom-dropdown : selected="" name="purchaseUom" id="purchaseUom" />
+                                <x-uom-dropdown :selected name="purchaseUom" id="purchaseUom" />
                             </div>
                             <div class="col-sm-3">
                                 <input type="text" class="form-control" id="formattedPurchasePrice" placeholder="Harga Beli" required>
@@ -93,7 +93,7 @@
                                 </div>
                                 <div class="col-sm-3">
                                     <!-- <input type="text" class="form-control" id="smallUom" name="smallUom" placeholder="Satuan Conversi"> -->
-                                    <x-uom-dropdown :selected="" name="smallUom" id="smallUom" />
+                                    <x-uom-dropdown :selected name="smallUom" id="smallUom" />
                                 </div>
                                 <div class="col-sm-3">
                                     <input type="text" class="form-control" id="formattedSmallPrice" placeholder="Harga Beli">
