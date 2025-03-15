@@ -52,7 +52,7 @@ class SalesController extends Controller
             ]);
 
             //calculate remaining payment
-            $remainingPayment = $request->totalPrice - $request->totalPrice <= 0 ? 0 : $request->totalPrice - $request->totalPayment;
+            $remainingPayment = $request->totalPrice - $request->totalPayment <= 0 ? 0 : $request->totalPrice - $request->totalPayment;
 
             //insert sales data
             Sales::create([
@@ -124,6 +124,7 @@ class SalesController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            dd($request->all()); // Debug request data
             // Start Transaction
             DB::beginTransaction();
             //validasi data yang diterima
@@ -143,6 +144,7 @@ class SalesController extends Controller
                 'items.*.sellingPricePerUnit' => 'required|numeric|min:1',
                 'items.*.totalPrice'  => 'required|numeric|min:1',
             ]);
+
 
             //calculate remaining payment
             $remainingPayment = $request->totalPrice - $request->totalPrice <= 0 ? 0 : $request->totalPrice - $request->totalPayment;
@@ -195,7 +197,45 @@ class SalesController extends Controller
 
             // Commit Transaction
             DB::commit();
-            return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
+            // return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            // return redirect()->back()->with('error', $e->getMessage());
+        }
+    }
+
+    //create delete function
+    public function destroy($id)
+    {
+        try {
+            // Start Transaction
+            DB::beginTransaction();
+            //get sales data by id include sales item data
+            $sales = Sales::with('items')->find($id);
+
+            //update remainingStock in stock table by stockId
+            foreach ($sales->items as $item) {
+                //get stock data by stockId
+                $stock = Stock::find($item->stock_id);
+                $stock->remainingStock += $item->qty;
+                $stock->totalStock += $item->qty;
+                $stock->totalPrice += $item->pricePerUnit * $item->qty;
+
+                $stock->save();
+
+                //delete inventory movement data
+                InventoryMovement::where('salesItem_id', $item->id)->delete();
+
+                //delete sales item data    
+                $item->delete();
+            }
+
+            //delete sales data
+            $sales->delete();
+
+            // Commit Transaction
+            DB::commit();
+            return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil dihapus');
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());

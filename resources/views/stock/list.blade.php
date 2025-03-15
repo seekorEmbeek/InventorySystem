@@ -53,12 +53,12 @@
                     </table>
 
                     <!-- PAGINATION -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p><strong>Menampilkan {{ $data->count() }} dari {{ $data->total() }} data</strong></p>
-                        <div>
-                            {{ $data->links() }}
-                        </div>
+                    <!-- <div class="d-flex justify-content-between align-items-center mb-2">
+                        <p><strong>Menampilkan {{ $data->count() }} dari {{ $data->total() }} data</strong></p> -->
+                    <div>
+                        {{ $data->links() }}
                     </div>
+                    <!-- </div> -->
                 </div>
             </div>
         </div>

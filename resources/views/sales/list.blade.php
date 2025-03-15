@@ -18,17 +18,17 @@
                             Create</a>
 
                     </div>
-                    <table class="table table-striped">
+                    <table id="salesTable" class="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
-                                <th scope="col">Nama Pembeli</th>
-                                <th scope="col">Tgl</th>
-                                <th scope="col">Total Harga</th>
-                                <th scope="col">Total Bayar</th>
-                                <th scope="col">Kekurangan</th>
-                                <th scope="col">Status</th>
-                                <th scope="col" width="350px">Action</th>
+                                <th  data-orderable="false" scope="col">#</th>
+                                <th data-orderable="false" scope="col">Nama Pembeli</th>
+                                <th data-orderable="true" scope="col">Tgl</th>
+                                <th data-orderable="true" scope="col">Total Harga</th>
+                                <th data-orderable="true" scope="col">Total Bayar</th>
+                                <th data-orderable="true" scope="col">Kekurangan</th>
+                                <th data-orderable="true" scope="col">Status</th>
+                                <th scope="col" width="180px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -65,12 +65,12 @@
                     </table>
 
                     <!-- PAGINATION -->
-                    <div class="d-flex justify-content-between align-items-center mb-2">
-                        <p><strong>Menampilkan {{ $data->count() }} dari {{ $data->total() }} data</strong></p>
-                        <div>
-                            {{ $data->links() }}
-                        </div>
+                    <!-- <div class="d-flex justify-content-between align-items-center mb-2"> -->
+                    <!-- <p><strong>Menampilkan {{ $data->count() }} dari {{ $data->total() }} data</strong></p> -->
+                    <div>
+                        {{ $data->links() }}
                     </div>
+                    <!-- </div> -->
                 </div>
             </div>
         </div>
@@ -79,10 +79,33 @@
 @stop
 
 @section('js')
+
 <script>
+    //
+
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
         $("#success-alert").fadeOut(500);
+    });
+
+
+    //function untuk orderable pada table
+    $(document).ready(function() {
+        $('#salesTable').DataTable({
+            "order": [
+                [2, "desc"],
+                [6, "asc"]
+            ], // Sort by Date (Descending) and Status (Ascending)
+            "columnDefs": [{
+                    "orderable": true,
+                    "targets": [2, 6]
+                }, // Enable sorting on Date and Status
+                {
+                    "orderable": false,
+                    "targets": [7]
+                } // Disable sorting on Action column
+            ],
+        });
     });
 </script>
 

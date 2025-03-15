@@ -58,7 +58,7 @@
                     </div>
 
                     <div class="col-md-4">
-                        <x-adminlte-select name="status" label="Status" readonly disabled>
+                        <x-adminlte-select name="status" id="status" label="Status" readonly>
                             <option value="" selected disabled></option>
                             <option value="LUNAS">LUNAS</option>
                             <option value="BELUM LUNAS">BELUM LUNAS</option>
