@@ -9,6 +9,7 @@ use App\Models\SalesItem;
 use App\Models\Stock;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Mockery\Undefined;
 
 class SalesController extends Controller
 {
@@ -52,7 +53,7 @@ class SalesController extends Controller
             ]);
 
             //calculate remaining payment
-            $remainingPayment = $request->totalPrice - $request->totalPayment <= 0 ? 0 : $request->totalPrice - $request->totalPayment;
+            $remainingPayment = max(0, $request->totalPrice - $request->totalPayment);
 
             //insert sales data
             Sales::create([
@@ -116,7 +117,18 @@ class SalesController extends Controller
         $sales = Sales::with('items')->find($id);
 
         //retrive all stock data where remainingStock > 0 and sellingPricePerUnit > 0
-        $stocks = Stock::where('remainingStock', '>', 0)->where('sellingPricePerUnit', '>', 0)->get();
+        $stocks = Stock::where('sellingPricePerUnit', '>', 0)->get();
+
+        //match stock data with sales item data
+        foreach ($sales->items as $item) {
+            //add remainingStock in stocks data from sales item data
+            $matchedStock = $stocks->where('id', $item->stock_id)->first();
+            $matchedStock->remainingStock += $item->qty;
+        }
+
+        //filter stock data where remainingStock > 0
+        $stocks = $stocks->where('remainingStock', '>', 0);
+
         return view('sales.edit', compact('sales', 'stocks'));
     }
 
@@ -124,7 +136,7 @@ class SalesController extends Controller
     public function update(Request $request, $id)
     {
         try {
-            dd($request->all()); // Debug request data
+            // dd($request->all());
             // Start Transaction
             DB::beginTransaction();
             //validasi data yang diterima
@@ -147,7 +159,7 @@ class SalesController extends Controller
 
 
             //calculate remaining payment
-            $remainingPayment = $request->totalPrice - $request->totalPrice <= 0 ? 0 : $request->totalPrice - $request->totalPayment;
+            $remainingPayment = max(0, $request->totalPrice - $request->totalPayment);
 
             //update sales data
             Sales::find($id)->update([
@@ -159,48 +171,121 @@ class SalesController extends Controller
                 'remainingPayment' => $remainingPayment
             ]);
 
-            //update remainingStock in stock table by stockId
-            foreach ($request->items as $item) {
-                //get stock data by stockId
-                $stock = Stock::find($item['stockId']);
-                $stock->remainingStock -= $item['qty'];
-                $stock->totalStock -= $item['qty'];
-                $stock->totalPrice -= $item['pricePerUnit'] * $item['qty'];
+            // Get existing sales items
+            $existingSalesItems = SalesItem::where('sales_id', $id)->get()->keyBy('id');
 
-                $stock->save();
+            //delete sales item data where old sales item data not in new sales item data
+            // **Delete Removed Items**
+            foreach ($existingSalesItems as $oldItem) {
+                if (!in_array($oldItem->id, array_column($request->items, 'id'))) {
+                    // Restore stock for removed item
+                    $stock = Stock::find($oldItem->stock_id);
+                    if ($stock) {
+                        $stock->remainingStock += $oldItem->qty;
+                        $stock->totalStock += $oldItem->qty;
+                        $stock->totalPrice += $oldItem->pricePerUnit * $oldItem->qty;
+                        $stock->save();
+                    }
 
-                //update sales item data
-                SalesItem::find($item['id'])->update([
-                    'productId' => $item['productId'],
-                    'productName' => $item['productName'],
-                    'uom' => $item['uom'],
-                    'qty' => $item['qty'],
-                    'pricePerUnit' => $item['pricePerUnit'],
-                    'sellingPricePerUnit' => $item['sellingPricePerUnit'],
-                    'totalSellingPrice' => $item['totalPrice'],
-                    'stock_id' => $item['stockId'],
-                ]);
-
-                //update inventory movement data
-                InventoryMovement::where('salesItem_id', $item['id'])->update([
-                    'productId' => $item['productId'],
-                    'productName' => $item['productName'],
-                    'uom' => $item['uom'],
-                    'qty' => $item['qty'],
-                    'movementType' => 'OUT',
-                    'date' =>  $request->date,
-                    'pricePerUnit' => $item['sellingPricePerUnit'],
-                    'totalPrice' => $item['totalPrice'],
-                ]);
+                    // Delete related records
+                    InventoryMovement::where('salesItem_id', $oldItem->id)->delete();
+                    $oldItem->delete();
+                }
             }
 
+            //update sales item data where old sales item data in new sales item data or insert new sales item data
+            foreach ($request->items as $item) {
+                //if item id is null then insert new item
+                if (!isset($item['id']) || empty($item['id'])) {
+                    //get stock data by stockId
+                    $stock = Stock::find($item['stockId']);
+
+                    // Ensure stock is not negative
+                    if ($stock->remainingStock < $item['qty']) {
+                        throw new \Exception("Stock untuk {$item['productName']} tidak mencukupi");
+                    }
+
+
+                    $stock->remainingStock -= $item['qty'];
+                    $stock->totalStock -= $item['qty'];
+                    $stock->totalPrice  = $item['pricePerUnit'] * $stock->totalStock;
+
+                    $stock->save();
+
+                    //insert sales item data
+                    $salesItem  = SalesItem::create([
+                        'sales_id' => $id,
+                        'productId' => $item['productId'],
+                        'productName' => $item['productName'],
+                        'uom' => $item['uom'],
+                        'qty' => $item['qty'],
+                        'pricePerUnit' => $item['pricePerUnit'],
+                        'sellingPricePerUnit' => $item['sellingPricePerUnit'],
+                        'totalSellingPrice' => $item['totalPrice'],
+                        'stock_id' => $item['stockId'],
+                    ]);
+
+                    //insert inventory movement data
+                    InventoryMovement::create([
+                        'productId' => $item['productId'],
+                        'productName' => $item['productName'],
+                        'uom' => $item['uom'],
+                        'qty' => $item['qty'],
+                        'movementType' => 'OUT',
+                        'date' =>  $request->date,
+                        'pricePerUnit' => $item['sellingPricePerUnit'],
+                        'totalPrice' => $item['totalPrice'],
+                        'salesItem_id' => $salesItem->id, // Now correctly referenced
+                    ]);
+                    //if item id is not null then update item
+                } else {
+                    // **Existing Item - Update**
+                    if (!isset($existingSalesItems[$item['id']])) {
+                        throw new \Exception("Sales Item with ID {$item['id']} not found.");
+                    }
+
+                    $salesItem = $existingSalesItems[$item['id']];
+                    $stock = Stock::findOrFail($item['stockId']);
+
+                    //update stock data
+                    $stock->remainingStock += $salesItem->qty - $item['qty'];
+                    $stock->totalStock += $salesItem->qty - $item['qty'];
+                    $stock->totalPrice = $stock->totalStock * $stock->pricePerUnit;
+
+                    $stock->save();
+
+                    //update sales item data
+                    $salesItem->update([
+                        'productId' => $item['productId'],
+                        'productName' => $item['productName'],
+                        'uom' => $item['uom'],
+                        'qty' => $item['qty'],
+                        'pricePerUnit' => $item['pricePerUnit'],
+                        'sellingPricePerUnit' => $item['sellingPricePerUnit'],
+                        'totalSellingPrice' => $item['totalPrice'],
+                        'stock_id' => $item['stockId'],
+                    ]);
+
+                    //update inventory movement data
+                    InventoryMovement::where('salesItem_id', $salesItem->id)->update([
+                        'productId' => $item['productId'],
+                        'productName' => $item['productName'],
+                        'uom' => $item['uom'],
+                        'qty' => $item['qty'],
+                        'movementType' => 'OUT',
+                        'date' =>  $request->date,
+                        'pricePerUnit' => $item['sellingPricePerUnit'],
+                        'totalPrice' => $item['totalPrice'],
+                    ]);
+                }
+            }
 
             // Commit Transaction
             DB::commit();
-            // return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
+            return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
         } catch (\Exception $e) {
             DB::rollBack();
-            // return redirect()->back()->with('error', $e->getMessage());
+            return redirect()->back()->with('error', $e->getMessage());
         }
     }
 
@@ -240,5 +325,13 @@ class SalesController extends Controller
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());
         }
+    }
+
+    //create function to get debt data
+    public function debt()
+    {
+        $data = Sales::where('remainingPayment', '>', 0)->latest()->paginate(10);
+        return view('sales.debt', compact('data'))
+            ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 }

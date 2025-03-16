@@ -347,6 +347,11 @@ return [
             'url'  => 'sales',
             'icon' => 'fas fa-truck',
         ],
+        [
+            'text' => 'HUTANG',
+            'url'  => 'debt',
+            'icon' => 'fas fa-fw fa-file',
+        ],
 
         // [
         //     'type' => 'sidebar-menu-search',

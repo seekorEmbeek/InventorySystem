@@ -47,3 +47,4 @@ Route::put('/stock/conversion/{id}', [StockController::class, 'updateConversion'
 
 //sales
 Route::resource('/sales', SalesController::class);
+Route::get('/debt', [SalesController::class, 'debt'])->name('sales.debt');

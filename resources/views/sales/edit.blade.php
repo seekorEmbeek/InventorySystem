@@ -57,10 +57,11 @@
                                     </option>
                                     @endforeach
                                 </select>
-
+                                <input type="hidden" name="items[{{ $loop->index }}][id]" value="{{ $item->id }}">
                                 <input type="hidden" name="items[{{ $loop->index }}][productName]" value="{{ $item->productName }}">
                                 <input type="hidden" name="items[{{ $loop->index }}][productId]" value="{{ $item->productId }}" class="productId">
-                                <input type="hidden" name="items[{{ $loop->index }}][stock_id]" value="{{ $item->stock_id }}" class="stockId">
+                                <input type="hidden" name="items[{{ $loop->index }}][stock_id]" value="{{ $item->stock_id }}" class="stock_Id">
+                                <input type="hidden" name="items[{{ $loop->index }}][stockId]" value="{{ $item->stock_id }}" class="stockId">
                             </td>
                             <td><input type="text" name="items[{{ $loop->index }}][uom]" class="form-control uom" value="{{ $item->uom }}" readonly></td>
                             <td><input type="number" name="items[{{ $loop->index }}][remaining]" class="form-control remaining" value="{{ $stocks->where('id', $item->stock_id)->first()?->remainingStock ?? 0 }}" readonly></td>
@@ -70,7 +71,7 @@
                                 <input type="hidden" name="items[{{ $loop->index }}][sellingPricePerUnit]" value="{{ $item->sellingPricePerUnit}}" class="price">
                                 <input type="hidden" name="items[{{ $loop->index }}][pricePerUnit]" value="{{ $item->pricePerUnit }}" class="pricePerUnit" readonly>
                             </td>
-                            <td><input type="number" name="items[{{ $loop->index }}][totalPrice]" class="form-control total" value="{{ $item->totalSellingPrice * $item->qty }}" readonly></td>
+                            <td><input type="number" name="items[{{ $loop->index }}][totalPrice]" class="form-control total" value="{{ $item->totalSellingPrice  }}" readonly></td>
                             <td><button type="button" class="btn btn-danger removeItem"><i class="fas fa-trash"></i></button></td>
                         </tr>
                         @endforeach
@@ -136,6 +137,12 @@
             row.querySelector(".productName").value = selectedOption.getAttribute("data-productName");
             row.querySelector(".productId").value = selectedOption.getAttribute("data-productId");
             row.querySelector(".stockId").value = selectedOption.value; // Ensure stockId is assigned properly
+
+            let priceValue = selectedOption.getAttribute("data-price");
+            let formattedPrice = new Intl.NumberFormat('id-ID').format(priceValue);
+            row.querySelector(".price").value = priceValue;
+            row.querySelector(".priceView").value = formattedPrice;
+
         }
 
         function updateTotalPrice(row) {
@@ -186,6 +193,7 @@
                 button.addEventListener("click", function() {
                     this.closest("tr").remove();
                     updateProductDropdowns();
+                    updateTotalPriceHeader();
                 });
             });
         }
@@ -253,29 +261,32 @@
             updateProductDropdowns();
         });
 
-        // Ensure Form Data is Captured
-        document.querySelector("form").addEventListener("submit", function(e) {
-            console.log("Form Data: ", new FormData(this));
+        // Format Total Payment Input
+        const formattedInput = document.getElementById("formattedTotalPayment");
+        const hiddenInput = document.getElementById("totalPayment");
+        const statusSelect = document.getElementById("status");
+
+        formattedInput.addEventListener("input", function(e) {
+            let rawValue = e.target.value.replace(/\D/g, "");
+            console.log('raw', rawValue);
+            if (rawValue !== "") {
+                console.log('formattedInput', rawValue);
+                formattedInput.value = parseInt(rawValue).toLocaleString("id-ID").replace(/,/g, ".");
+                hiddenInput.value = rawValue;
+
+                let totalPrice = parseInt(document.getElementById("totalPrice").value);
+                statusSelect.value = (parseInt(rawValue) >= totalPrice) ? "LUNAS" : "BELUM LUNAS";
+            } else {
+                hiddenInput.value = "";
+            }
         });
 
-        // Format Total Payment Input
-        document.addEventListener("DOMContentLoaded", function() {
-            const formattedInput = document.getElementById("formattedTotalPayment");
-            const hiddenInput = document.getElementById("totalPayment");
-            const statusSelect = document.getElementById("status");
-
-            formattedInput.addEventListener("input", function(e) {
-                let rawValue = e.target.value.replace(/\D/g, "");
-                if (rawValue !== "") {
-                    formattedInput.value = parseInt(rawValue).toLocaleString("id-ID").replace(/,/g, ".");
-                    hiddenInput.value = rawValue;
-
-                    let totalPrice = parseInt(document.getElementById("totalPrice").value);
-                    statusSelect.value = (parseInt(rawValue) >= totalPrice) ? "LUNAS" : "BELUM LUNAS";
-                } else {
-                    hiddenInput.value = "";
-                }
-            });
+        //if status is LUNAS, then total payment is equal to total price
+        statusSelect.addEventListener("change", function(e) {
+            if (e.target.value === "LUNAS") {
+                formattedInput.value = parseInt(document.getElementById("totalPrice").value).toLocaleString("id-ID").replace(/,/g, ".");
+                hiddenInput.value = document.getElementById("totalPrice").value;
+            }
         });
 
     });

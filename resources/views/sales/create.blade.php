@@ -221,6 +221,14 @@
                 }
             });
         }
+
+        //if status is LUNAS, then total payment is equal to total price
+        statusSelect.addEventListener("change", function(e) {
+            if (e.target.value === "LUNAS") {
+                formattedInput.value = parseInt(document.getElementById("totalPrice").value).toLocaleString("id-ID").replace(/,/g, ".");
+                hiddenInput.value = document.getElementById("totalPrice").value;
+            }
+        });
     });
 
     //KONVERSI HARGA KE NILAI INDONESIA
