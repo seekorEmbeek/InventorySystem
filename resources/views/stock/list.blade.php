@@ -68,7 +68,7 @@
                                 <th scope="col">Sisa Stock</th>
                                 <th scope="col">Harga Rata2 per Satuan</th>
                                 <th scope="col">Harga Jual per Satuan</th>
-                                <th data-orderable="false" scope="col" width="350px">Action</th>
+                                <th data-orderable="false" scope="col" width="180px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -82,14 +82,14 @@
                                 <td>{{ number_format($c->pricePerUnit, 0, ',', '.') }}</td>
                                 <td>{{ number_format($c->sellingPricePerUnit, 0, ',', '.') }}</td>
                                 <td>
-                                    <div class="d-flex justify-content-around">
-                                        <a href="{{ route('stock.edit',$c->id)}}" class="btn btn-primary">
+                                    <div class="d-flex right-content-around">
+                                        <a href="{{ route('stock.edit',$c->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
-                                            Edit</a>
-
-                                        <a href="{{ route('stock.conversion',$c->id)}}" class="btn btn-warning">
+                                        </a>
+                                        &nbsp;
+                                        <a href="{{ route('stock.conversion',$c->id)}}" class="btn btn-warning" data-toggle="tooltip" data-placement="top" title="Conversi">
                                             <i class="fas fa-exchange-alt"></i>
-                                            Conversi</a>
+                                        </a>
                                     </div>
                                 </td>
                             </tr>
@@ -115,6 +115,11 @@
 
 @section('js')
 <script>
+    //tooltip
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
         $("#success-alert").fadeOut(500);
@@ -134,10 +139,8 @@
 
             ],
             "language": {
-                "paginate": {
-                    "previous": "",
-                    "next": ""
-                }
+                "search": "Cari:",
+                "info": "Menampilkan _START_ sampai _END_ dari _TOTAL_ data"
             },
             "drawCallback": function(settings) {
                 var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
@@ -148,7 +151,7 @@
                 }
             },
             "lengthChange": false, // Hide "Show X entries" dropdown
-            "pageLength": 10, // Default number of entries per page
+            "pageLength": 15, // Default number of entries per page
             "pagingType": "simple_numbers", // Use "simple_numbers" pagination style
             "info": true, // Keep "Showing X of Y entries"
             "ordering": true, // Enable sorting

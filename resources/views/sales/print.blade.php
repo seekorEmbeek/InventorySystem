@@ -31,7 +31,7 @@
                                 <td>{{ $item->productName }}</td>
                                 <td>{{ $item->qty }}</td>
                                 <td>{{ $item->uom }}</td>
-                                <td>Rp {{ number_format($item->pricePerUnit, 0, ',', '.') }}</td>
+                                <td>Rp {{ number_format($item->sellingPricePerUnit, 0, ',', '.') }}</td>
                                 <td>Rp {{ number_format($item->totalSellingPrice, 0, ',', '.') }}</td>
                             </tr>
                             @endforeach

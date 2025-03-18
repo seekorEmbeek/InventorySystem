@@ -86,7 +86,7 @@
                                 <th data-orderable="false" scope="col">Jumlah</th>
                                 <th data-orderable="false" scope="col">Satuan</th>
                                 <th scope="col">Harga</th>
-                                <th scope="col" width="270px">Action</th>
+                                <th scope="col" width="180px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -101,16 +101,17 @@
                                 <td>{{ $c->smallUom }}</td>
                                 <td>{{ number_format($c->smallPrice, 0, ',', '.') }}</td>
                                 <td>
-                                    <div class="d-flex justify-content-around">
-                                        <a href="{{ route('purchasing.edit',$c->id)}}" class="btn btn-primary">
+                                    <div class="d-flex right-content-around">
+                                        <a href="{{ route('purchasing.edit',$c->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
-                                            Edit</a>
+                                        </a>
+                                        &nbsp;
                                         <form action="{{ route('purchasing.destroy',$c->id)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">
+                                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Hapus">
                                                 <i class="fas fa-trash"></i>
-                                                Delete</button>
+                                            </button>
                                         </form>
                                     </div>
 
@@ -139,6 +140,11 @@
 @section('js')
 
 <script>
+    //tooltip
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
+
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
         $("#success-alert").fadeOut(500);

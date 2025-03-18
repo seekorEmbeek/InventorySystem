@@ -94,18 +94,20 @@
                                 <td>{{ number_format($c->remainingPayment, 0, ',', '.') }}</td>
                                 <td>{{ $c->status }}</td>
                                 <td>
-                                    <div class="d-flex justify-content-around">
-                                        <a href="{{ route('sales.edit',$c->id)}}" class="btn btn-primary">
+                                    <div class="d-flex right-content-around">
+                                        <a href="{{ route('sales.edit',$c->id)}}" class="btn btn-primary" data-toggle="tooltip" data-placement="top" title="Edit">
                                             <i class="fas fa-edit"></i>
                                         </a>
+                                        &nbsp;
                                         <form action="{{ route('sales.destroy',$c->id)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-danger">
+                                            <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Hapus">
                                                 <i class="fas fa-trash"></i>
                                             </button>
                                         </form>
-                                        <a href="{{ route('sales.print',$c->id)}}" class="btn btn-secondary">
+                                        &nbsp;
+                                        <a href="{{ route('sales.print',$c->id)}}" class="btn btn-secondary" data-toggle="tooltip" data-placement="top" title="Cetak Nota">
                                             <i class="fas fa-print"></i>
                                         </a>
                                     </div>
@@ -135,6 +137,10 @@
 @section('js')
 
 <script>
+    //tooltip
+    $(function() {
+        $('[data-toggle="tooltip"]').tooltip();
+    });
     //
 
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
