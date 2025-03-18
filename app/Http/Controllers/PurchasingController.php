@@ -18,7 +18,8 @@ class PurchasingController extends Controller
     public function index()
     {
         $data = Purchasing::latest()->paginate(10);
-        return view('purchasing.list', compact('data'))
+        $product = Product::all();
+        return view('purchasing.list', compact('data', 'product'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 

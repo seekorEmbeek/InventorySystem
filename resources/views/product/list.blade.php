@@ -32,13 +32,13 @@
                             Create</a>
 
                     </div>
-                    <table class="table table-striped">
+                    <table id="productTable" class="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th data-orderable="false" scope="col">#</th>
                                 <th scope="col">Nama</th>
-                                <th scope="col">Satuan</th>
-                                <th scope="col" width="350px">Action</th>
+                                <th data-orderable="false" scope="col">Satuan</th>
+                                <th data-orderable="false" scope="col" width="350px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -70,13 +70,10 @@
                         </tbody>
                     </table>
 
-                    <!-- PAGINATION -->
-                    <!-- <div class="d-flex justify-content-between align-items-center mb-2">
-    <p><strong>Menampilkan {{ $product->count() }} dari {{ $product->total() }} data</strong></p> -->
                     <div>
                         {{ $product->links() }}
                     </div>
-                    <!-- </div> -->
+
                 </div>
             </div>
         </div>
@@ -89,6 +86,26 @@
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
         $("#success-alert").fadeOut(500);
+    });
+
+    //function untuk orderable pada table
+    $(document).ready(function() {
+        $('#productTable').DataTable({
+            "order": [
+                [0, "desc"],
+                [1, "asc"]
+            ], // Sort by Date (Descending) and Status (Ascending)
+            "columnDefs": [{
+                    "orderable": true,
+                    "targets": [0, 1]
+                }, // Enable sorting on Date and Status
+                {
+                    "orderable": false,
+                    "targets": [2]
+                } // Disable sorting on Action column
+            ],
+
+        });
     });
 </script>
 

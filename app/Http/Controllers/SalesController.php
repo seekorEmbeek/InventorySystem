@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\InventoryMovement;
+use App\Models\Product;
 use App\Models\Sales;
 use App\Models\SalesItem;
 use App\Models\Stock;
@@ -17,7 +18,8 @@ class SalesController extends Controller
     public function index()
     {
         $data = Sales::latest()->paginate(10);
-        return view('sales.list', compact('data'))
+        $product = Product::all();
+        return view('sales.list', compact('data', 'product'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 

@@ -12,16 +12,16 @@
 
             <div class="card">
                 <div class="card-body">
-                    <table class="table table-striped">
+                    <table id="stockTable" class="table table-striped">
                         <thead>
                             <tr>
-                                <th scope="col">#</th>
+                                <th data-orderable="false" scope="col">#</th>
                                 <th scope="col">Nama Barang</th>
                                 <th scope="col">Satuan</th>
                                 <th scope="col">Sisa Stock</th>
                                 <th scope="col">Harga Rata2 per Satuan</th>
                                 <th scope="col">Harga Jual per Satuan</th>
-                                <th scope="col" width="350px">Action</th>
+                                <th data-orderable="false" scope="col" width="350px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -71,6 +71,22 @@
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
         $("#success-alert").fadeOut(500);
+    });
+
+    //function untuk orderable pada table
+    $(document).ready(function() {
+        $('#stockTable').DataTable({
+            "order": [
+                [1, "desc"],
+                [3, "asc"]
+            ], // Sort by Date (Descending) and Status (Ascending)
+            "columnDefs": [{
+                    "orderable": true,
+                    "targets": [1, 3]
+                }, // Enable sorting on Date and Status
+
+            ],
+        });
     });
 </script>
 
