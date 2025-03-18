@@ -42,7 +42,7 @@
                             <label for="inputEmail3" class="col-sm-2 col-form-label">Barang</label>
                             <div class="col-sm-10">
                                 <x-adminlte-select2 name="productId" id="product" required>
-                                    <option value="" disabled selected>Harap pilih barang ...</option>
+                                    <option value="" disabled selected>🔍 Pilih barang ...</option>
                                     @foreach ($product as $c)
 
                                     <option value="{{ $c->id}}">{{ $c-> name }}</option>
@@ -63,7 +63,7 @@
                                     required> -->
                                 <x-uom-dropdown :selected name="purchaseUom" id="purchaseUom" />
                             </div>
-                            <div class="col-sm-3">
+                            <div class="col-sm-4">
                                 <input type="text" class="form-control" id="formattedPurchasePrice" placeholder="Harga Beli" required>
                                 <input type="hidden" id="purchasePrice" name="purchasePrice">
                             </div>
@@ -106,7 +106,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fa fa-save"></i>
                                 Save</button>
-
+                            <a href="{{ route('purchasing.index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
                         </div>
                     </form>
                 </div>
@@ -122,6 +122,9 @@
 <!-- Load jQuery First -->
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
+<!-- Latest DataTables -->
+<script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
 <!-- AUTO UPDATE CONVERSION FIELDS -->
 <script>
     // ENABLING CONVERSION FIELDS

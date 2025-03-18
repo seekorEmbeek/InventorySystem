@@ -108,7 +108,7 @@
                             <button type="submit" class="btn btn-success">
                                 <i class="fa fa-save"></i>
                                 Save</button>
-
+                            <a href="{{ route('purchasing.index') }}" class="btn btn-secondary"><i class="fas fa-arrow-left"></i> Back</a>
                         </div>
                     </form>
                 </div>

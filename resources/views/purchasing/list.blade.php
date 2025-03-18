@@ -86,7 +86,7 @@
                                 <th data-orderable="false" scope="col">Jumlah</th>
                                 <th data-orderable="false" scope="col">Satuan</th>
                                 <th scope="col">Harga</th>
-                                <th scope="col" width="350px">Action</th>
+                                <th scope="col" width="270px">Action</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -137,6 +137,7 @@
 @stop
 
 @section('js')
+
 <script>
     //fungsi dibawah untuk menghilangkan alert dengan efek fadeout   
     $("#success-alert").fadeTo(2000, 500).fadeOut(500, function() {
@@ -144,23 +145,40 @@
     });
 
 
-    //function untuk orderable pada table
     $(document).ready(function() {
-        $('#purchTable').DataTable({
-            "order": [
-                [2, "desc"],
-                [6, "asc"]
-            ], // Sort by Date (Descending) and Status (Ascending)
+        var table = $('#purchTable').DataTable({
             "columnDefs": [{
                     "orderable": true,
                     "targets": [2, 6]
-                }, // Enable sorting on Date and Status
+                },
                 {
                     "orderable": false,
                     "targets": [7]
-                } // Disable sorting on Action column
+                }
             ],
+            "language": {
+                "paginate": {
+                    "previous": "",
+                    "next": ""
+                }
+            },
+            "drawCallback": function(settings) {
+                var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                if (settings._iDisplayLength >= settings.fnRecordsDisplay()) {
+                    pagination.hide();
+                } else {
+                    pagination.show();
+                }
+            },
+            "lengthChange": false, // Hide "Show X entries" dropdown
+            "pageLength": 10, // Default number of entries per page
+            "pagingType": "simple_numbers", // Use "simple_numbers" pagination style
+            "info": true, // Keep "Showing X of Y entries"
+            "ordering": true, // Enable sorting
+            "autoWidth": true, // Disable auto column width
+            "responsive": true // Make table responsive
         });
+
     });
 
     // Select2 Initialization

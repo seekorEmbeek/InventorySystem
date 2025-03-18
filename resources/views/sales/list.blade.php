@@ -27,6 +27,14 @@
                             <input type="date" id="dateTo" name="dateTo" class="form-control">
                         </div>
                         <div class="form-group">
+                            <label for="status">Status Pembayaran</label>
+                            <select name="status" id="status" class="form-control">
+                                <option value="" selected></option>
+                                <option value="LUNAS">LUNAS</option>
+                                <option value="BELUM LUNAS">BELUM LUNAS</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
                             <label for="productName">Nama Barang</label>
                             <x-adminlte-select2 name="productName" id="productName" class="form-control" required>
                                 <option value="" disabled selected>🔍 Pilih barang ...</option>
@@ -89,14 +97,17 @@
                                     <div class="d-flex justify-content-around">
                                         <a href="{{ route('sales.edit',$c->id)}}" class="btn btn-primary">
                                             <i class="fas fa-edit"></i>
-                                            Edit</a>
+                                        </a>
                                         <form action="{{ route('sales.destroy',$c->id)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">
                                                 <i class="fas fa-trash"></i>
-                                                Delete</button>
+                                            </button>
                                         </form>
+                                        <a href="{{ route('sales.print',$c->id)}}" class="btn btn-secondary">
+                                            <i class="fas fa-print"></i>
+                                        </a>
                                     </div>
 
                                 </td>
@@ -142,12 +153,31 @@
                     "orderable": true,
                     "targets": [2, 6]
                 }, // Enable sorting on Date and Status
-                {
-                    "orderable": false,
-                    "targets": [7]
-                } // Disable sorting on Action column
+
             ],
+            "language": {
+                "paginate": {
+                    "previous": "",
+                    "next": ""
+                }
+            },
+            "drawCallback": function(settings) {
+                var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                if (settings._iDisplayLength >= settings.fnRecordsDisplay()) {
+                    pagination.hide();
+                } else {
+                    pagination.show();
+                }
+            },
+            "lengthChange": false, // Hide "Show X entries" dropdown
+            "pageLength": 10, // Default number of entries per page
+            "pagingType": "simple_numbers", // Use "simple_numbers" pagination style
+            "info": true, // Keep "Showing X of Y entries"
+            "ordering": true, // Enable sorting
+            "autoWidth": true, // Disable auto column width
+            "responsive": true // Make table responsive
         });
+
     });
 
 
@@ -182,11 +212,13 @@
             let dateFrom = document.getElementById("dateFrom").value;
             let dateTo = document.getElementById("dateTo").value;
             let productName = document.getElementById("productName").value;
+            let status = document.getElementById("status").value;
 
             let queryParams = new URLSearchParams({
                 dateFrom: dateFrom,
                 dateTo: dateTo,
-                productName: productName
+                productName: productName,
+                status: status
             });
 
             window.location.href = exportUrl + "?" + queryParams.toString();

@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Product;
 use App\Models\Stock;
+use App\Models\StockConversionHistories;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
@@ -12,8 +14,9 @@ class StockController extends Controller
     //
     public function index()
     {
+        $product = Product::all();
         $data = Stock::latest()->paginate(10);
-        return view('stock.list', compact('data'))
+        return view('stock.list', compact('data', 'product'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
     }
 
@@ -106,6 +109,19 @@ class StockController extends Controller
                 $newStock->sellingPricePerUnit = $request->get('sellingPricePerUnit');
                 $newStock->save();
             }
+
+            //insert conversion history
+            $conversionHistory = new StockConversionHistories();
+            $conversionHistory->stockId = $stock->id;
+            $conversionHistory->productId = $stock->productId;
+            $conversionHistory->productName = $stock->productName;
+            $conversionHistory->uomBefore = $stock->uom;
+            $conversionHistory->qtyBefore = $request->get('conversionQty');
+            $conversionHistory->pricePerUnitBefore = $stock->pricePerUnit;
+            $conversionHistory->uomAfter = $request->get('smallUom');
+            $conversionHistory->qtyAfter = $request->get('smallQty');
+            $conversionHistory->pricePerUnitAfter = $request->get('smallPrice');
+            $conversionHistory->save();
 
             DB::commit(); // Commit transaction
 

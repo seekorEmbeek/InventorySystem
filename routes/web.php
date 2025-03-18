@@ -2,6 +2,7 @@
 
 use App\Exports\PurchasingExport;
 use App\Exports\SalesExport;
+use App\Exports\StockExport;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ProductController;
@@ -52,6 +53,7 @@ Route::put('/stock/conversion/{id}', [StockController::class, 'updateConversion'
 //sales
 Route::resource('/sales', SalesController::class);
 Route::get('/debt', [SalesController::class, 'debt'])->name('sales.debt');
+Route::get('/sales/print/{id}', [SalesController::class, 'print'])->name('sales.print');
 
 //export
 Route::get('/export-purchasing', function (Request $request) {
@@ -78,6 +80,19 @@ Route::get('/export-sales', function (Request $request) {
     return Excel::download(new SalesExport(
         $request->dateFrom,
         $request->dateTo,
-        $request->productName
+        $request->productName,
+        $request->status // Add status parameter
     ), $fileName);
 })->name('export.sales');
+
+Route::get('/export-stock', function (Request $request) {
+    $productName = $request->productName ?? 'ALL';
+
+    // Format filename dynamically
+    $fileName = "Rekap_Stock_{$productName}.xlsx";
+    return Excel::download(new StockExport(
+        $request->dateFrom,
+        $request->dateTo,
+        $request->productName
+    ), $fileName);
+})->name('export.stock');

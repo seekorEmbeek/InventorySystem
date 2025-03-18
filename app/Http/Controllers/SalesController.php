@@ -58,7 +58,7 @@ class SalesController extends Controller
             $remainingPayment = max(0, $request->totalPrice - $request->totalPayment);
 
             //insert sales data
-            Sales::create([
+            $sales = Sales::create([
                 'buyerName' => $request->buyerName,
                 'date' => $request->date,
                 'totalPayment' => $request->totalPayment,
@@ -106,7 +106,10 @@ class SalesController extends Controller
 
             // Commit Transaction
             DB::commit();
-            return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil disimpan');
+            // return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil disimpan');
+
+            // Redirect to print preview route
+            return redirect()->route('sales.print', ['id' => $sales->id]);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());
@@ -164,7 +167,7 @@ class SalesController extends Controller
             $remainingPayment = max(0, $request->totalPrice - $request->totalPayment);
 
             //update sales data
-            Sales::find($id)->update([
+            $sales = Sales::find($id)->update([
                 'buyerName' => $request->buyerName,
                 'date' => $request->date,
                 'totalPayment' => $request->totalPayment,
@@ -284,7 +287,8 @@ class SalesController extends Controller
 
             // Commit Transaction
             DB::commit();
-            return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
+            // return redirect()->route('sales.index')->with('success', 'Data penjualan berhasil diupdate');
+            return redirect()->route('sales.print', ['id' => $id]);
         } catch (\Exception $e) {
             DB::rollBack();
             return redirect()->back()->with('error', $e->getMessage());
@@ -335,5 +339,11 @@ class SalesController extends Controller
         $data = Sales::where('remainingPayment', '>', 0)->latest()->paginate(10);
         return view('sales.debt', compact('data'))
             ->with('i', (request()->input('page', 1) - 1) * 10);
+    }
+
+    public function print($id)
+    {
+        $sales = Sales::with('items')->findOrFail($id);
+        return view('sales.print', compact('sales'));
     }
 }

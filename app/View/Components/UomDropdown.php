@@ -19,7 +19,7 @@ class UomDropdown extends Component
     public function __construct($selected = null, $name = 'uom', $id = 'uom')
     {
         // $this->uoms = $uoms;
-        $this->uoms = ['PCS', 'BOX', 'KG', 'METER', 'LITER', 'PETI'];
+        $this->uoms = ['PCS', 'BOX', 'KG', 'METER', 'LITER', 'PETI', 'KARUNG', 'BOSS', 'KARDUS'];
         $this->selected = $selected;
         $this->name = $name;
         $this->id = $id;

@@ -2,23 +2,19 @@
 
 namespace App\Exports;
 
-use App\Models\Purchasing;
+use App\Models\Stock;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class PurchasingExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
+class StockExport implements FromCollection, WithHeadings, ShouldAutoSize, WithStyles
 {
-    protected $dateFrom;
-    protected $dateTo;
     protected $productName;
 
-    public function __construct($dateFrom, $dateTo, $productName)
+    public function __construct($productName)
     {
-        $this->dateFrom = $dateFrom;
-        $this->dateTo = $dateTo;
         $this->productName = $productName;
     }
 
@@ -27,11 +23,8 @@ class PurchasingExport implements FromCollection, WithHeadings, ShouldAutoSize, 
      */
     public function collection()
     {
-        $query = Purchasing::select('supplierName', 'date', 'productName', 'smallQty', 'pricePerUnit', 'smallUom', 'smallPrice');
-
-        if ($this->dateFrom && $this->dateTo) {
-            $query->whereBetween('date', [$this->dateFrom, $this->dateTo]);
-        }
+        //
+        $query = Stock::select('productName', 'remainingStock', 'uom', 'pricePerUnit', 'sellingPricePerUnit');
 
         if (!empty($this->productName)) {
             $query->where('productName', 'LIKE', '%' . $this->productName . '%');
@@ -42,11 +35,11 @@ class PurchasingExport implements FromCollection, WithHeadings, ShouldAutoSize, 
 
     public function headings(): array
     {
-        return ["Nama Supplier", "Tanggal", "Barang", "Qty", "Harga Per Unit", "Satuan", "Total Harga"];
+        return ["Nama Barang", "Sisa Barang", "Satuan", "Harga Per Unit", "Harga Jual Per Unit"];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:G1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:E1')->getFont()->setBold(true);
     }
 }

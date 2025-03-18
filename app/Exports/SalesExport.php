@@ -14,12 +14,14 @@ class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
     protected $dateFrom;
     protected $dateTo;
     protected $productName;
+    protected $status;
 
-    public function __construct($dateFrom, $dateTo, $productName)
+    public function __construct($dateFrom, $dateTo, $productName, $status)
     {
         $this->dateFrom = $dateFrom;
         $this->dateTo = $dateTo;
         $this->productName = $productName;
+        $this->status = $status;
     }
 
     /**
@@ -32,6 +34,10 @@ class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
             ->whereHas('items', function ($query) {
                 if (!empty($this->productName)) {
                     $query->where('productName', $this->productName);
+                }
+
+                if (!empty($this->status)) {
+                    $query->where('status', $this->status);
                 }
             })
             ->get();

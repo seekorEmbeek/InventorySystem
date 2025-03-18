@@ -7,11 +7,58 @@
 
 @section('content')
 <div class="container-fluid">
+
+    <!-- Export Modal -->
+    <div class="modal fade" id="exportModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Cetak Data</h5>
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                </div>
+                <div class="modal-body">
+                    <form id="exportForm">
+                        <!-- <div class="form-group">
+                            <label for="dateFrom">Tgl Awal Laporan</label>
+                            <input type="date" id="dateFrom" name="dateFrom" class="form-control">
+                        </div>
+                        <div class="form-group">
+                            <label for="dateTo">Tgl Akhir Laporan</label>
+                            <input type="date" id="dateTo" name="dateTo" class="form-control">
+                        </div> -->
+                        <div class="form-group">
+                            <label for="productName">Nama Barang</label>
+                            <x-adminlte-select2 name="productName" id="productName" class="form-control" required>
+                                <option value="" disabled selected>🔍 Pilih barang ...</option>
+                                @foreach ($product->unique('name') as $c) {{-- Ensure unique values --}}
+                                <option value="{{ strtoupper($c->name) }}">{{ strtoupper($c->name) }}</option>
+                                @endforeach
+                            </x-adminlte-select2>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" id="exportSubmit">Export</button>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="row">
         <div class="col-md-12">
 
             <div class="card">
                 <div class="card-body">
+
+                    <div class="float-right">
+                        <a id="exportStockBtn" id="" class="btn btn-success">
+                            <i class="fas fa-fw fa-file"></i>
+                            Cetak</a>
+
+                    </div>
+
                     <table id="stockTable" class="table table-striped">
                         <thead>
                             <tr>
@@ -86,6 +133,72 @@
                 }, // Enable sorting on Date and Status
 
             ],
+            "language": {
+                "paginate": {
+                    "previous": "",
+                    "next": ""
+                }
+            },
+            "drawCallback": function(settings) {
+                var pagination = $(this).closest('.dataTables_wrapper').find('.dataTables_paginate');
+                if (settings._iDisplayLength >= settings.fnRecordsDisplay()) {
+                    pagination.hide();
+                } else {
+                    pagination.show();
+                }
+            },
+            "lengthChange": false, // Hide "Show X entries" dropdown
+            "pageLength": 10, // Default number of entries per page
+            "pagingType": "simple_numbers", // Use "simple_numbers" pagination style
+            "info": true, // Keep "Showing X of Y entries"
+            "ordering": true, // Enable sorting
+            "autoWidth": true, // Disable auto column width
+            "responsive": true // Make table responsive
+        });
+
+    });
+
+
+    // Select2 Initialization
+    $(document).ready(function() {
+        // Ensure Select2 initializes correctly inside a modal
+        $('#productName').select2({
+            theme: 'bootstrap4', // Use AdminLTE theme
+            placeholder: "🔍 Pilih barang...",
+            allowClear: true // Allow users to clear selection
+        });
+
+        // Fix issue where Select2 dropdown gets cut off inside the modal
+        $('#exportModal').on('shown.bs.modal', function() {
+            $('#productName').select2({
+                dropdownParent: $('#exportModal'), // Fixes display inside modal
+                theme: 'bootstrap4'
+            });
+        });
+    });
+
+    //Add JavaScript to Handle Export
+    document.addEventListener("DOMContentLoaded", function() {
+        let exportUrl = "";
+
+        document.getElementById("exportStockBtn").addEventListener("click", function() {
+            exportUrl = "{{ route('export.stock') }}";
+            $("#exportModal").modal("show");
+        });
+
+        document.getElementById("exportSubmit").addEventListener("click", function() {
+            // let dateFrom = document.getElementById("dateFrom").value;
+            // let dateTo = document.getElementById("dateTo").value;
+            let productName = document.getElementById("productName").value;
+
+            let queryParams = new URLSearchParams({
+                // dateFrom: dateFrom,
+                // dateTo: dateTo,
+                productName: productName
+            });
+
+            window.location.href = exportUrl + "?" + queryParams.toString();
+            $("#exportModal").modal("hide");
         });
     });
 </script>
