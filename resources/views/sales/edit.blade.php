@@ -34,6 +34,7 @@
                             <th>Sisa Stock</th>
                             <th>Qty Pembelian</th>
                             <th>Harga Per Unit</th>
+                            <th>Harga Jual Per Unit</th>
                             <th>Total Harga</th>
                             <th> <x-adminlte-button label="+" theme="success" id="addItem" /></th>
                         </tr>
@@ -66,10 +67,11 @@
                             <td><input type="text" name="items[{{ $loop->index }}][uom]" class="form-control uom" value="{{ $item->uom }}" readonly></td>
                             <td><input type="number" name="items[{{ $loop->index }}][remaining]" class="form-control remaining" value="{{ $stocks->where('id', $item->stock_id)->first()?->remainingStock ?? 0 }}" readonly></td>
                             <td><input type="number" name="items[{{ $loop->index }}][qty]" class="form-control qty" value="{{ $item->qty }}" required></td>
+                            <td><input type="number" name="items[{{ $loop->index }}][pricePerUnit]" class="form-control pricePerUnit" value="{{ $item->pricePerUnit }}" readonly></td>
                             <td>
-                                <input type="number" name="items[{{ $loop->index }}][priceView]" class="form-control priceView" value="{{  number_format($item->sellingPricePerUnit, 0, ',', '.')}}" readonly>
-                                <input type="hidden" name="items[{{ $loop->index }}][sellingPricePerUnit]" value="{{ $item->sellingPricePerUnit}}" class="price">
-                                <input type="hidden" name="items[{{ $loop->index }}][pricePerUnit]" value="{{ $item->pricePerUnit }}" class="pricePerUnit" readonly>
+                                <!-- <input type="number" name="items[{{ $loop->index }}][priceView]" class="form-control priceView" value="{{  number_format($item->sellingPricePerUnit, 0, ',', '.')}}" readonly> -->
+                                <input type="number" name="items[{{ $loop->index }}][sellingPricePerUnit]" value="{{ $item->sellingPricePerUnit}}" class="form-control price">
+                                <!-- <input type="number" name="items[{{ $loop->index }}][pricePerUnit]" value="{{ $item->pricePerUnit }}" class="pricePerUnit" readonly> -->
                             </td>
                             <td><input type="number" name="items[{{ $loop->index }}][totalPrice]" class="form-control total" value="{{ $item->totalSellingPrice  }}" readonly></td>
                             <td><button type="button" class="btn btn-danger removeItem"><i class="fas fa-trash"></i></button></td>
@@ -189,6 +191,13 @@
                 });
             });
 
+            document.querySelectorAll(".price").forEach(input => {
+                input.addEventListener("input", function() {
+                    let row = this.closest("tr");
+                    updateTotalPrice(row);
+                });
+            });
+
             document.querySelectorAll(".removeItem").forEach(button => {
                 button.addEventListener("click", function() {
                     this.closest("tr").remove();
@@ -245,10 +254,9 @@
             <td><input type="text" name="items[${rowCount}][uom]" class="form-control uom" readonly required></td>
             <td><input type="number" name="items[${rowCount}][remaining]" class="form-control remaining" readonly required></td>
             <td><input type="number" name="items[${rowCount}][qty]" class="form-control qty" required min="1"></td>
+            <td><input type="number" name="items[${rowCount}][pricePerUnit]" class="form-control pricePerUnit" readonly></td>
             <td>
-                <input type="number" class="form-control priceView" readonly required>
-                <input type="hidden" name="items[${rowCount}][sellingPricePerUnit]" class="price">
-                <input type="hidden" name="items[${rowCount}][pricePerUnit]" class="pricePerUnit" readonly>
+                <input type="number" name="items[${rowCount}][sellingPricePerUnit]" class="form-control price" required>
             </td>
             <td>
                 <input type="number" name="items[${rowCount}][totalPrice]" class="form-control total" readonly>
@@ -270,7 +278,6 @@
             let rawValue = e.target.value.replace(/\D/g, "");
             console.log('raw', rawValue);
             if (rawValue !== "") {
-                console.log('formattedInput', rawValue);
                 formattedInput.value = parseInt(rawValue).toLocaleString("id-ID").replace(/,/g, ".");
                 hiddenInput.value = rawValue;
 

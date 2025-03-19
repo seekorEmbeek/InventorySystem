@@ -34,6 +34,7 @@
                             <th>Sisa Stock</th>
                             <th>Qty Pembelian</th>
                             <th>Harga Per Unit</th>
+                            <th>Harga Jual Per Unit</th>
                             <th>Total Harga</th>
                             <th> <x-adminlte-button label="+" theme="success" id="addItem" /></th>
                         </tr>
@@ -113,10 +114,9 @@
                 <td><input type="text" name="items[${index}][uom]" class="form-control uom" readonly required></td>
                 <td><input type="number" name="items[${index}][remaining]" class="form-control remaining" readonly required></td>
                 <td><input type="number" name="items[${index}][qty]" class="form-control qty" required min="1"></td>
+                <td><input type="number" name="items[${index}][pricePerUnit]" class="form-control pricePerUnit" readonly></td>
                 <td>
-                <input type="number" class="form-control priceView" readonly required>
-                <input type="hidden" name="items[${index}][sellingPricePerUnit]" class="price">
-                <input type="hidden" name="items[${index}][pricePerUnit]" class="pricePerUnit" readonly>
+                <input type="number" name="items[${index}][sellingPricePerUnit]" class="form-control price" required>
                 </td>
                 <td>
                     <input type="number" name="items[${index}][totalPrice]" class="form-control total" readonly>
@@ -135,6 +135,7 @@
                 button.addEventListener("click", function() {
                     this.closest("tr").remove();
                     updateProductDropdowns();
+
                 });
             });
 
@@ -154,11 +155,14 @@
                     let priceValue = selectedOption.getAttribute("data-price");
                     let formattedPrice = new Intl.NumberFormat('id-ID').format(priceValue);
                     row.querySelector(".price").value = priceValue;
-                    row.querySelector(".priceView").value = formattedPrice;
+                    // row.querySelector(".priceView").value = formattedPrice;
 
                     row.querySelector(".remaining").value = selectedOption.getAttribute("data-remaining");
+                    row.querySelector(".total").value = 0; // Reset total price when product changes
+                    row.querySelector(".qty").value = 0; // Reset total price when product changes
 
                     updateProductDropdowns();
+                    updateTotalPrice();
                 });
             });
 
@@ -186,6 +190,22 @@
                         row.querySelector(".qty").value = remaining;
                     }
 
+                    updateTotalPrice(); // Update total payment when any item changes
+                });
+
+            });
+
+
+            // Update total price when selling price per unit or qty changes
+            document.querySelectorAll(".price").forEach(input => {
+                input.addEventListener("input", function(e) {
+                    //set row value
+                    let row = this.closest("tr");
+
+                    let qty = parseFloat(row.querySelector(".qty").value) || 0;
+                    let price = parseFloat(row.querySelector(".price").value) || 0; // Remove thousand separator before calculating
+                    let total = Math.round(qty * price); // Calculate total per item
+                    row.querySelector(".total").value = total;
                     updateTotalPrice(); // Update total payment when any item changes
                 });
 
@@ -222,13 +242,7 @@
             });
         }
 
-        //if status is LUNAS, then total payment is equal to total price
-        statusSelect.addEventListener("change", function(e) {
-            if (e.target.value === "LUNAS") {
-                formattedInput.value = parseInt(document.getElementById("totalPrice").value).toLocaleString("id-ID").replace(/,/g, ".");
-                hiddenInput.value = document.getElementById("totalPrice").value;
-            }
-        });
+
     });
 
     //KONVERSI HARGA KE NILAI INDONESIA
@@ -252,6 +266,14 @@
                 }
             } else {
                 hiddenInput.value = "";
+            }
+        });
+
+        //if status is LUNAS, then total payment is equal to total price
+        statusSelect.addEventListener("change", function(e) {
+            if (e.target.value === "LUNAS") {
+                formattedInput.value = parseInt(document.getElementById("totalPrice").value).toLocaleString("id-ID").replace(/,/g, ".");
+                hiddenInput.value = document.getElementById("totalPrice").value;
             }
         });
 

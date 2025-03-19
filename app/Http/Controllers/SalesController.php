@@ -26,7 +26,7 @@ class SalesController extends Controller
     public function create()
     {
         //retrive all stock data where remainingStock > 0 and sellingPricePerUnit > 0
-        $stocks = Stock::where('remainingStock', '>', 0)->where('sellingPricePerUnit', '>', 0)->get();
+        $stocks = Stock::where('remainingStock', '>', 0)->get();
 
         return view('sales.create', compact('stocks'));
     }
@@ -122,7 +122,7 @@ class SalesController extends Controller
         $sales = Sales::with('items')->find($id);
 
         //retrive all stock data where remainingStock > 0 and sellingPricePerUnit > 0
-        $stocks = Stock::where('sellingPricePerUnit', '>', 0)->get();
+        $stocks = Stock::all();
 
         //match stock data with sales item data
         foreach ($sales->items as $item) {
