@@ -22,7 +22,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('purchasing.store') }}" method="post" enctype="multipart/form-data">
+                    <form action="{{ route('purchasing.store',[],false) }}" method="post" enctype="multipart/form-data">
                         @csrf
 
                         <div class="row mb-3">

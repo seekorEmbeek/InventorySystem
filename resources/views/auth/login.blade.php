@@ -18,7 +18,7 @@
                       </div>
                      @enderror
                       {{-- ganti action ke route name yaitu proses.login --}}
-                    <form method="POST" action="{{ route('login') }}">
+                    <form method="POST" action="{{  secure_url(route('login')) }}">
                         @csrf
 
                         <div class="row mb-3">

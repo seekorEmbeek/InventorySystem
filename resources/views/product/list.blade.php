@@ -53,7 +53,7 @@
                                         <a href="{{ route('product.edit',$c->id)}}" class="btn btn-primary">
                                             <i class="fas fa-edit"></i>
                                             Edit</a>
-                                        <form action="{{ route('product.destroy',$c->id)}}" method="POST">
+                                        <form action="{{ route('product.destroy',$c->id,false)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger">

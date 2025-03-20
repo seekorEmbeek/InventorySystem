@@ -12,7 +12,7 @@
         <div class="col-md-12">
             <div class="card">
                 <div class="card-body">
-                    <form action="{{ route('product.update',$product->id) }}" method="post">
+                    <form action="{{ route('product.update',$product->id,false) }}" method="post">
                         @csrf
                         @method('PUT')
 

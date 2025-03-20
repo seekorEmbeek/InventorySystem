@@ -106,7 +106,7 @@
                                             <i class="fas fa-edit"></i>
                                         </a>
                                         &nbsp;
-                                        <form action="{{ route('purchasing.destroy',$c->id)}}" method="POST">
+                                        <form action="{{ route('purchasing.destroy',$c->id,false)}}" method="POST">
                                             @csrf
                                             @method('DELETE')
                                             <button type="submit" class="btn btn-danger" data-toggle="tooltip" data-placement="top" title="Hapus">
