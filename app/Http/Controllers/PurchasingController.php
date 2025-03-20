@@ -218,19 +218,23 @@ class PurchasingController extends Controller
         try {
             DB::beginTransaction(); // Start transaction
 
-            Purchasing::where('id', $purchasing->id)->delete();
-
             //update stock
             $stock = Stock::where('productId', $purchasing->productId)
                 ->where('uom', $purchasing->smallUom)->first();
 
             if ($stock) {
+                //thhrow error jika qty yang dihapus lebih besar dari qty yang ada
+                if ($stock->remainingStock < $purchasing->smallQty) {
+                    throw new \Exception('Stock tidak mencukupi');
+                }
                 $stock->totalStock -= $purchasing->smallQty;
                 $stock->remainingStock -= $purchasing->smallQty;
                 $stock->totalPrice -= $purchasing->smallPrice;
-                $stock->pricePerUnit = $stock->totalPrice / $stock->remainingStock;
+                $stock->pricePerUnit = $stock->remainingStock == 0 ? 0 : $stock->totalPrice / $stock->remainingStock;
                 $stock->save();
             }
+         
+            Purchasing::where('id', $purchasing->id)->delete();
 
             //delete inventory movement
             InventoryMovement::where('purchase_id', $purchasing->id)->delete();
