@@ -2,6 +2,7 @@
 
 namespace App\View\Components;
 
+use App\Models\Product;
 use Closure;
 use Illuminate\View\Component;
 use Illuminate\Contracts\View\View;
@@ -19,7 +20,9 @@ class UomDropdown extends Component
     public function __construct($selected = null, $name = 'uom', $id = 'uom')
     {
         // $this->uoms = $uoms;
-        $this->uoms = ['PCS', 'BOX', 'KG', 'METER', 'LITER', 'PETI', 'KARUNG', 'BOSS', 'KARDUS'];
+        // $this->uoms = ['PCS', 'BOX', 'KG', 'METER', 'LITER', 'PETI', 'KARUNG', 'BOSS', 'KARDUS'];
+        $uoms = Product::pluck('uom')->toArray();
+        $this->uoms = array_unique($uoms);
         $this->selected = $selected;
         $this->name = $name;
         $this->id = $id;

@@ -7,6 +7,7 @@ use Maatwebsite\Excel\Concerns\FromArray;
 use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
 class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
@@ -43,9 +44,15 @@ class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
             ->get();
 
         $data = [];
+        $totalProfit = 0; // Track total profit
+
         foreach ($sales as $sale) {
             $rowSpan = count($sale->items);
             foreach ($sale->items as $index => $item) {
+                // Calculate profit only for "LUNAS" status
+                $profit = ($sale->status == "LUNAS") ? ($item->sellingPricePerUnit - $item->pricePerUnit) * $item->qty : 0;
+                $totalProfit += $profit; // Add profit to total
+
                 $data[] = [
                     'buyerName' => $index == 0 ? $sale->buyerName : '',
                     'date' => $index == 0 ? $sale->date : '',
@@ -53,13 +60,32 @@ class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
                     'qty' => $item->qty,
                     'uom' => $item->uom,
                     'pricePerUnit' => number_format($item->pricePerUnit, 2, ',', '.'),
+                    'sellingPricePerUnit' => number_format($item->sellingPricePerUnit, 2, ',', '.'),
                     'totalPricePerItem' => number_format($item->totalSellingPrice, 2, ',', '.'),
                     'totalPrice' => $index == 0 ? number_format($sale->totalPrice, 2, ',', '.') : '',
                     'totalPayment' => $index == 0 ? number_format($sale->totalPayment, 2, ',', '.') : '',
-                    'status' => $index == 0 ? $sale->status : ''
+                    'status' => $index == 0 ? $sale->status : '',
+                    'totalProfit' => number_format($profit, 2, ',', '.'),
                 ];
             }
         }
+
+        // Append total profit summary row
+        $data[] = [
+            'buyerName' => '',
+            'date' => '',
+            'productName' => '',
+            'qty' => '',
+            'uom' => '',
+            'pricePerUnit' => '',
+            'sellingPricePerUnit' => '',
+            'totalPricePerItem' => '',
+            'totalPrice' => '',
+            'totalPayment' => '',
+            'status' => 'TOTAL PROFIT:',
+            'totalProfit' => number_format($totalProfit, 2, ',', '.'),
+        ];
+
 
         return $data;
     }
@@ -72,15 +98,21 @@ class SalesExport implements FromArray, WithHeadings, ShouldAutoSize, WithStyles
             'Qty',
             'Satuan',
             'Harga Per Unit',
+            'Harga Jual Per Unit',
             'Total Harga Per Barang',
             'Total Harga',
             'Total Pembayaran',
             'Status',
+            'Total Profit'
         ];
     }
 
     public function styles(Worksheet $sheet)
     {
-        $sheet->getStyle('A1:J1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:L1')->getFont()->setBold(true);
+
+        // Bold Total Profit Summary Row
+        $lastRow = count($this->array()) + 1; // Find last row
+        $sheet->getStyle("K{$lastRow}:L{$lastRow}")->getFont()->setBold(true);
     }
 }
